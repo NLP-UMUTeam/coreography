@@ -47,3 +47,32 @@ coreography/
 ├── index.php
 ├── routes.php
 └── scripts.php
+```
+
+## Installation
+
+To get started with CoreOGraphy, follow these steps:
+
+1. Clone the repository:
+```
+    git clone https://github.com/NLP-UMUTeam/coreography.git  
+    cd coreography
+```
+
+2. Install dependencies using Composer:
+```
+    composer install
+```
+
+3. Create your configuration file:
+```
+    cp config.sample.php config.php
+```
+
+4. Edit the configuration file:
+- Open `config.php`
+- Adjust the required settings (database, paths, environment variables, etc.)
+
+5. Run the application:
+- Make sure your web server points to `index.php`
+- Ensure write permissions for directories like `cache/`
