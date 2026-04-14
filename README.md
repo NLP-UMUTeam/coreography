@@ -1,4 +1,7 @@
 # CoreOGraphy
+<p align="center">
+  <img src="https://pln.inf.um.es/core-o-graphy.png" width="400"/>
+</p>
 
 A lightweight PHP micro-core for building web applications with a pragmatic stack:
 **AltoRouter** for routing, **Twig** for templating, **Symfony components** for developer tooling and console commands, and a simple project structure oriented to small and medium-sized applications.
