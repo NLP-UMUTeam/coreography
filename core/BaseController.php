@@ -2,10 +2,10 @@
 
 namespace CoreOGraphy;
 
-use \Zend\Diactoros\ServerRequestFactory;
-use \Zend\Diactoros\Response;
-use \Zend\Diactoros\Request;
-use \Zend\HttpHandlerRunner\Emitter\SapiEmitter;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 
 
 
@@ -16,19 +16,19 @@ use \Zend\HttpHandlerRunner\Emitter\SapiEmitter;
  */
 abstract class BaseController {
 
-    /** @var $_request */
+    /** @var mixed */
     protected $_request;
     
-
-    /** @var $_template */
+    
+    /** @var mixed */
     protected $_template;
     
     
-    /** @var $_container */
+    /** @var mixed */
     protected $_container;
     
     
-    /** @var response */
+    /** @var \Psr\Http\Message\ResponseInterface */
     protected $_response;
     
     
@@ -60,7 +60,13 @@ abstract class BaseController {
         
         
         // Create the request
-        $this->_request = ServerRequestFactory::fromGlobals ($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
+        $this->_request = ServerRequestFactory::fromGlobals(
+            $_SERVER,
+            $_GET,
+            $_POST,
+            $_COOKIE,
+            $_FILES
+        );
         
        
         // Get class info for the current controller
@@ -90,19 +96,46 @@ abstract class BaseController {
     
     
     /**
-     * handles
-     *
-     * @package Core-o-Graphy
+     * Return decoded JSON payload from php://input.
      */
+    public function getRequestPayload(): array {
+        global $container;
+
+        if (!isset($container['payload'])) {
+            $rawPayload = file_get_contents('php://input');
+            $decoded = json_decode($rawPayload ?: '', true);
+
+            $container['payload'] = is_array($decoded) ? $decoded : [];
+        }
+
+        return $container['payload'];
     
-    public function handle () {
+    }
     
-        // Handle request
-        $this->handleRequest ();
     
-        
-        // Create the response
-        $emitter = new SapiEmitter();
+    /**
+     * Set a JSON response.
+     */
+    public function setJSONResponse (array $response, int $statusCode = 200): void {
+        $jsonResponse = new JsonResponse (
+            $response,
+            $statusCode,
+            ['Content-Type' => 'application/json; charset=utf-8']
+        );
+
+        $this->_response = $jsonResponse->withEncodingOptions (
+            JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+        );
+    }
+    
+    
+    /**
+     * Execute controller and emit response.
+     */
+    public function handle (): void {
+        $this->handleRequest( );
+
+        $emitter = new SapiEmitter ();
         $emitter->emit ($this->_response);
     }
     

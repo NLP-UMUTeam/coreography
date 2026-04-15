@@ -1,37 +1,52 @@
 {
     "name": "smolky/coreography",
     "type": "project",
-    "version": "1.0.0-dev",
-    
-    "minimum-stability": "dev", 
-    
-    "description": "The Core-o-Graphy Framework.",
-    "keywords": ["framework", "coreograhpy"],
-    
+    "version": "2.0.0",
+    "description": "CoreOGraphy is a lightweight PHP micro-framework with routing, dependency injection, templating, console commands and HTTP abstractions.",
+    "keywords": [
+        "php",
+        "framework",
+        "micro-framework",
+        "coreography",
+        "twig",
+        "console",
+        "psr-7"
+    ],
+    "license": "MIT",
+
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+
     "autoload": {
         "psr-4": {
-            "CoreOGraphy\\": ["core/", "custom/"],
-            "CoreOGraphy\\Command\\": ["commands/"]
+            "CoreOGraphy\\": [
+                "core/",
+                "custom/"
+            ],
+            "CoreOGraphy\\Command\\": [
+                "commands/"
+            ]
         }
     },
-    
+
     "require": {
-        "php": ">=5.5.0",
-        
-        "altorouter/altorouter": "*",
-        "pimple/pimple": "*",
-        "twig/twig": "*",
-        "swiftmailer/swiftmailer": "*",
-        "robmorgan/phinx": "*",
-        "symfony/debug": "*",
-        "symfony/console": "*",
-        "symfony/filesystem": "*",
-        "symfony/finder": "*",
-        "zendframework/zend-diactoros": "*",
-        "philipp15b/php-i18n": "*",
-        "zendframework/zend-httphandlerrunner": "^1.1@dev"
+        "php": "^8.1 || ^8.2 || ^8.3",
+
+        "altorouter/altorouter": "^1.2",
+        "pimple/pimple": "^3.6",
+        "twig/twig": "^3.24",
+        "symfony/mailer": "^6.4",
+        "robmorgan/phinx": "^0.16",
+        "symfony/error-handler": "^6.4",
+        "symfony/console": "^6.4",
+        "symfony/filesystem": "^6.4",
+        "symfony/finder": "^6.4",
+        "laminas/laminas-diactoros": "^3.8",
+        "laminas/laminas-httphandlerrunner": "^2.13",
+        "philipp15b/php-i18n": "^4.0"
     },
+
     "require-dev": {
-        "symfony/var-dumper": "^5.0@dev"
+        "symfony/var-dumper": "^6.4"
     }
 }

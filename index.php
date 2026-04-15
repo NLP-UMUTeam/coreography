@@ -1,107 +1,95 @@
 <?php
 
-use \Twig\Loader\FilesystemLoader;
-use \Twig\Environment;
-use \Twig\TwigFunction;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use Twig\TwigFunction;
 
 /**
- * CoreOGraphy
+ * Application front controller.
  *
- * This is just a simple PHP framework for custom purposes
- *
- * @author José Antonio García Díaz <joseantonio.garcia8@um.es>
- *
- * @package Core-o-Graphy
+ * This file boots the framework, configures shared services
+ * such as Twig and the router, resolves the current route,
+ * and delegates the request to the matched controller.
  */
 
-// Require vendor
+// Bootstrap the application and shared services.
 require_once __DIR__ . '/core/bootstrap.php';
 
 
 
-/**
- * @var $twig_configuration Array
- *
- * Create and configure the template system
- *
- * @link http://whateverthing.com/blog/2015/02/17/twig-tips-configuring-cache/
- */
-$twig_configuration = [];
+
+/*
+|--------------------------------------------------------------------------
+| Twig configuration
+|--------------------------------------------------------------------------
+*/
+
+$twigConfiguration = [];
 
 if (PRODUCTION) {
-    $twig_configuration = [
-        'cache'       => CACHE_DIR . 'templates',
-        'auto_reload' => true
+    $twigConfiguration = [
+        'cache' => CACHE_DIR . 'templates',
+        'auto_reload' => true,
+    ];
+} else {
+    $twigConfiguration = [
+        'cache' => false,
+        'auto_reload' => true,
+        'debug' => true,
     ];
 }
 
-
-/** @var $loader Twig_Loader_Filesystem Where the templates are stored */
-$loader = new FilesystemLoader ('templates');
-
-
-/** @var $twig Environment Twig global object */
-$twig = new Environment ($loader, $twig_configuration);
+$loader = new FilesystemLoader (__DIR__ . '/templates');
+$twig = new Environment ($loader, $twigConfiguration);
 
 
-// Add global variables to the template
+// Global template variables.
 $twig->addGlobal ('base_url', BASE_URL);
-$twig->addGlobal ('version', PRODUCTION ? VERSION : rand (1, 10000));
+$twig->addGlobal ('version', PRODUCTION ? VERSION : (string) random_int(1, 10000));
 
-
-// Store the template system as a service
-$container['loader'] = $loader;
-$container['templates'] = $twig;
-
-
-// If translations services are loaded, then 
-// attach it to TWIG as a helper function
-if ($container['i18n']) {
-    
-    $twig->addFunction (new TwigFunction ('__', function ($method) {
+// Translation helper.
+if (isset ($container['i18n']) && $container['i18n']) {
+    $twig->addFunction (new TwigFunction('__', function (string $method): string {
         try {
-            return call_user_func ('I' . '::' . $method); 
-            
-        } catch (Exception $e) {
+            return (string) call_user_func('I::' . $method);
+        } catch (\Throwable $e) {
             return '';
         }
     }));
 }
 
 
-
-/** @var $router AltoRouter The service that resolves routes */
-$router = new AltoRouter ();
-
-
-// Configure the basepath of the routes
-$router->setBasePath (ltrim (BASE_URL, '/'));
+// Store Twig services in the container.
+$container['loader'] = $loader;
+$container['templates'] = $twig;
 
 
-// Store the routing system as a service
+
+/*
+|--------------------------------------------------------------------------
+| Router configuration
+|--------------------------------------------------------------------------
+*/
+
+$router = new AltoRouter();
+$router->setBasePath(ltrim(BASE_URL, '/'));
+
 $container['router'] = $router;
 
-
-// Attach routes
+// Load route definitions.
 require_once __DIR__ . '/routes.php';
 
 
-/** @var $match callable match current request URL */
-$match = $router->match ();
 
+$match = $router->match();
 
-// Determine which controller will handle the current route
 if ($match && is_callable ($match['target'])) {
     $controller = call_user_func_array ($match['target'], $match['params']);
-    
 } else {
-
-    // No controller was found, using a 404 controller
     require __DIR__ . '/controllers/maintenance/NotFound404.php';
     $controller = new NotFound404 ();
-    
 }
 
 
-// Handle the controller
-echo $controller->handle ();
+
+$controller->handle ();

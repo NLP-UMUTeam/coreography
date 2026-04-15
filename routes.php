@@ -1,44 +1,43 @@
 <?php
 
-// Home page
+/**
+ * Application routes.
+ *
+ * This file registers the HTTP routes handled by the application.
+ *
+ * Conventions:
+ * - Controller routes return an instantiated controller.
+ * - Simple utility routes may handle the response directly.
+ * - Controllers are loaded from the controllers/ directory.
+ */
+
+/**
+ * Load and instantiate a controller class from the controllers directory.
+ *
+ * Example:
+ *   controller('login/Index.php', 'Index')
+ *
+ * @param string $file  Relative path inside controllers/
+ * @param string $class Class name to instantiate
+ *
+ * @return object
+ */
+function controller (string $file, string $class): object {
+    require __DIR__ . '/controllers/' . $file;
+    return new $class();
+}
+
+/*
+|--------------------------------------------------------------------------
+| Public routes
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * Home page.
+ *
+ * The root path currently redirects users to the maintenance / not found page.
+ */
 $router->map ('GET', '/', function () {
-
-    // Load the classifier page
-    require __DIR__ . '/controllers/maintenance/NotFound404.php';
-    return new NotFound404 ();
-    
-});
-
-
-// Login
-$router->map ('GET|POST', '/login', function () {
-    // To the home page, the user must be logged
-    require __DIR__ . '/controllers/login/Index.php';
-    return new Index ();
-    
-});
-
-
-// Register
-$router->map ('GET|POST', '/register', function () {
-
-    // To the home page, the user must be logged
-    require __DIR__ . '/controllers/register/Index.php';
-    return new Index ();
-    
-});
-
-// Logout
-$router->map ('GET', '/logout', function () { 
-
-    global $base_url;
-
-    // Destroy session
-    session_destroy();
-
-    
-    // Reload
-    header ('Location: ' . $base_url);
-    die ();
-    
+    return controller ('maintenance/NotFound404.php', 'NotFound404');
 });
