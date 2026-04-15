@@ -38,15 +38,13 @@ coreography/
 ├── core/
 ├── css/
 ├── custom/
-├── js/
 ├── lang/
 ├── templates/
 ├── .htaccess
 ├── composer.json
 ├── config.sample.php
 ├── index.php
-├── routes.php
-└── scripts.php
+└── routes.php
 ```
 
 ## Installation
